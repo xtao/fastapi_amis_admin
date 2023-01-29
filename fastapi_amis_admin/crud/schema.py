@@ -19,7 +19,7 @@ class BaseApiSchema(BaseModel):
         json_loads = json.loads
         json_dumps = json.dumps
         json_encoders = {
-            datetime: lambda v: v.strftime("%Y-%m-%d %H:%M:%S"),
+            datetime: lambda v: v.isoformat(),
         }
 
 
