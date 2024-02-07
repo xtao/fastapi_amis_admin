@@ -2132,6 +2132,7 @@ class CRUD(AmisNode):
     title: str = None  # "" # Can be set to empty, when set to empty, there is no title bar
     className: str = None  # The class name of the outer Dom of the table
     api: API = None  # The api that CRUD uses to get list data.
+    deferApi: API = None  # The interface used to delay loading option details. It can be left unconfigured,
     loadDataOnce: bool = None  # whether to load all data at once (front-end paging)
     loadDataOnceFetchOnFilter: bool = None  # True # When loadDataOnce is turned on, whether to re-request the api
     # when filtering
