@@ -69,7 +69,7 @@ from .utils import (
     parser_str_set_list,
 )
 
-sql_operator_pattern: Pattern = re.compile(r"^\[(=|<=|<|>|>=|!|!=|<>|\*|!\*|~|!~|-)]")
+sql_operator_pattern: Pattern = re.compile(r"^\[(=|<=|<|>|>=|!|!=|<>|\*|!\*|~|!~|-|#)]")
 sql_operator_map: Dict[str, str] = {
     "=": "__eq__",
     "<=": "__le__",
@@ -84,6 +84,7 @@ sql_operator_map: Dict[str, str] = {
     "~": "like",
     "!~": "not_like",
     "-": "between",
+    "#": "json",
 }
 
 
@@ -224,6 +225,8 @@ class SqlalchemySelector(Generic[TableModelT]):
                     if len(value) < 2:
                         return None, None
                     return operator, tuple(map(python_type_parse, value))
+                elif operator == "json":
+                    return operator, int(value)
         return operator, (python_type_parse(value),)
 
     def calc_filter_clause(self, data: Dict[str, Any]) -> List[BinaryExpression]:
@@ -233,7 +236,11 @@ class SqlalchemySelector(Generic[TableModelT]):
             if sqlfield is not None:
                 operator, val = self._parser_query_value(v, python_type_parse=get_python_type_parse(sqlfield))
                 if operator:
-                    lst.append(getattr(sqlfield, operator)(*val))
+                    if operator == "json":
+                        field_json = func.json_each(sqlfield).table_valued("value", joins_implicitly=True)
+                        lst.append(field_json.c.value==val)
+                    else:
+                        lst.append(getattr(sqlfield, operator)(*val))
         return lst
 
 
