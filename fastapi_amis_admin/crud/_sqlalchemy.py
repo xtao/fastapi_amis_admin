@@ -385,7 +385,7 @@ class SqlalchemyCrud(
             if isinstance(v, dict):
                 # Relational attributes, nested;such as: setattr(article.content, "body", "new body")
                 sub = getattr(obj, name)
-                if not isinstance(sub, dict):  # Ensure that the attribute is an object.
+                if sub and not isinstance(sub, dict):  # Ensure that the attribute is an object.
                     self.update_item(sub, v)
                     continue
             setattr(obj, name, v)
