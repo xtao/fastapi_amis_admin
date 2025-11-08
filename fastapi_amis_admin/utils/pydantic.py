@@ -1,4 +1,5 @@
 from enum import Enum
+from datetime import datetime
 from functools import lru_cache
 from typing import Any, Dict, Optional, Sequence, Set, Type, Union
 
@@ -26,7 +27,12 @@ if PYDANTIC_V2:
     from pydantic.v1.typing import is_literal_type, is_none_type, is_union
 
     class AllowExtraModelMixin(BaseModel):
-        model_config = ConfigDict(extra="allow")
+        model_config = ConfigDict(
+            extra="allow",
+            json_encoders={
+                datetime: lambda v: v.isoformat(),
+            }
+        )
 
     class ORMModelMixin(BaseModel):
         model_config = ConfigDict(from_attributes=True)
@@ -115,6 +121,9 @@ else:
     class AllowExtraModelMixin(BaseModel):
         class Config:
             extra = "allow"
+            json_encoders = {
+                datetime: lambda v: v.isoformat(),
+            }
 
     class ORMModelMixin(BaseModel):
         class Config:
